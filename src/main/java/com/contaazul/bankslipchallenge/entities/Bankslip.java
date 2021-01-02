@@ -29,7 +29,8 @@ public class Bankslip extends BaseEntity{
 	@Builder.Default
 	private BigDecimal fine = BigDecimal.ZERO;
 	@Enumerated(EnumType.STRING)
-	private BankslipStatus status;
+	@Builder.Default
+	private BankslipStatus status = BankslipStatus.PENDING;
 
 	public void calculateFine(){
 		if(LocalDate.now().compareTo( dueDate ) > 0 ) {

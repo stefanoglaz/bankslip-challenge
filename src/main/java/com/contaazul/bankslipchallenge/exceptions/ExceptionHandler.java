@@ -15,16 +15,37 @@ public class ExceptionHandler {
 
 	private static final String CONTENT_TYPE = "Content-Type";
 	private static final String UNPROCESSABLE_ENTITY = "Unprocessable Entity";
+	private static final String NOT_FOUND = "Not Found";
+	private static final String BAD_REQUEST = "Bad Request";
 
-	@org.springframework.web.bind.annotation.ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentNotValidException.class})
+	@org.springframework.web.bind.annotation.ExceptionHandler({ HttpMessageNotReadableException.class,
+			MethodArgumentNotValidException.class })
 	public ResponseEntity<ResponseDetail> handleNotReadableException(Exception exception,
 			HttpServletRequest request, HttpServletResponse response) {
 
 		response.setHeader( CONTENT_TYPE, MediaType.APPLICATION_JSON.toString() );
-		ResponseDetail errorDetail = buildErrorDetail( UNPROCESSABLE_ENTITY, "Invalid bankslip provided.The possible reasons are:A field of the provided bankslip was null or with invalid values ");
+		ResponseDetail errorDetail = buildErrorDetail( UNPROCESSABLE_ENTITY,
+				"Invalid bankslip provided.The possible reasons are:A field of the provided bankslip was null or with invalid values " );
 		return new ResponseEntity<>( errorDetail, null, HttpStatus.UNPROCESSABLE_ENTITY );
 	}
 
+	@org.springframework.web.bind.annotation.ExceptionHandler(BankslipNotFoundException.class)
+	public ResponseEntity<ResponseDetail> handleBankslipNotFoundException(Exception exception,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		response.setHeader( CONTENT_TYPE, MediaType.APPLICATION_JSON.toString() );
+		ResponseDetail errorDetail = buildErrorDetail( NOT_FOUND, "Bankslip not found with the specified id" );
+		return new ResponseEntity<>( errorDetail, null, HttpStatus.NOT_FOUND );
+	}
+
+	@org.springframework.web.bind.annotation.ExceptionHandler(BusinessException.class)
+	public ResponseEntity<ResponseDetail> handleBusinessException(Exception exception,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		response.setHeader( CONTENT_TYPE, MediaType.APPLICATION_JSON.toString() );
+		ResponseDetail errorDetail = buildErrorDetail( BAD_REQUEST, exception.getMessage() );
+		return new ResponseEntity<>( errorDetail, null, HttpStatus.BAD_REQUEST );
+	}
 
 	private ResponseDetail buildErrorDetail(String title, String detail) {
 
